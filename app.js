@@ -14,7 +14,9 @@ async function fetchQiita(tag) {
   const res = await fetch(
     `https://qiita.com/api/v2/items?query=tag:${encodeURIComponent(tag)}&per_page=${perPage}`
   );
+  if (!res.ok) throw new Error(`Qiita API error: ${res.status}`);
   const data = await res.json();
+  if (!Array.isArray(data)) throw new Error(`Unexpected response: ${JSON.stringify(data).slice(0, 100)}`);
   const articles = data.map((a) => ({
     title: a.title,
     url: a.url,
@@ -71,7 +73,8 @@ async function fetchArticles(tag) {
 
     articles.forEach((a) => articlesEl.appendChild(createCard(a)));
   } catch (err) {
-    loadingEl.textContent = "記事の読み込みに失敗しました。";
+    loadingEl.textContent = `エラー: ${err.message}`;
+    console.error(err);
   }
 }
 
