@@ -3,21 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Design News</title>
+  <title>UI/UX Design News</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>Design News</h1>
-    <p>最新のデザイントレンド記事をチェックしよう</p>
+    <h1>UI/UX Design News</h1>
+    <p>デザインのトレンド・ツール・法則・事例を読もう</p>
   </header>
 
   <main>
-    <div class="filters">
-      <button class="filter-btn active" data-tag="Design">デザイン</button>
+    <div class="sources">
+      <button class="source-btn active" data-source="qiita">🇯🇵 日本語</button>
+      <button class="source-btn" data-source="devto">🌍 海外</button>
+    </div>
+
+    <div class="filters" id="qiita-filters">
+      <button class="filter-btn active" data-tag="UIデザイン">UI デザイン</button>
       <button class="filter-btn" data-tag="UX">UX</button>
-      <button class="filter-btn" data-tag="CSS">CSS</button>
-      <button class="filter-btn" data-tag="UI">UI</button>
+      <button class="filter-btn" data-tag="Figma">Figma</button>
+      <button class="filter-btn" data-tag="デザイン思考">デザイン思考</button>
+      <button class="filter-btn" data-tag="アクセシビリティ">アクセシビリティ</button>
+    </div>
+
+    <div class="filters" id="devto-filters" style="display:none">
+      <button class="filter-btn active" data-tag="ux">UX</button>
+      <button class="filter-btn" data-tag="ui">UI</button>
+      <button class="filter-btn" data-tag="figma">Figma</button>
+      <button class="filter-btn" data-tag="design">Design</button>
+      <button class="filter-btn" data-tag="a11y">Accessibility</button>
+    </div>
+
+    <div class="sorts">
+      <button class="sort-btn active" data-sort="latest">最新</button>
+      <button class="sort-btn" data-sort="popular">人気</button>
     </div>
 
     <div id="loading" class="loading">読み込み中...</div>
