@@ -1,36 +1,30 @@
 const articlesEl = document.getElementById("articles");
 const loadingEl = document.getElementById("loading");
 const sourceBtns = document.querySelectorAll(".source-btn");
-const qiitaFilters = document.getElementById("qiita-filters");
+const zennFilters = document.getElementById("zenn-filters");
 const devtoFilters = document.getElementById("devto-filters");
 
-let currentSource = "qiita";
+let currentSource = "zenn";
 let currentSort = "latest";
 
-// ========== Qiita ==========
-async function fetchQiita(tag) {
-  // 人気順の場合は多めに取得してlikes_countで並べ替え
-  const perPage = currentSort === "popular" ? 30 : 15;
+// ========== Zenn ==========
+async function fetchZenn(tag) {
+  const order = currentSort === "popular" ? "trending" : "latest";
   const res = await fetch(
-    `https://qiita.com/api/v2/items?query=tag:${encodeURIComponent(tag)}&per_page=${perPage}`
+    `https://zenn.dev/api/articles?topic=${encodeURIComponent(tag)}&order=${order}&count=15`
   );
-  if (!res.ok) throw new Error(`Qiita API error: ${res.status}`);
+  if (!res.ok) throw new Error(`Zenn API error: ${res.status}`);
   const data = await res.json();
-  if (!Array.isArray(data)) throw new Error(`Unexpected response: ${JSON.stringify(data).slice(0, 100)}`);
-  const articles = data.map((a) => ({
+  const articles = data.articles || [];
+  return articles.map((a) => ({
     title: a.title,
-    url: a.url,
-    author: a.user.id,
-    date: new Date(a.created_at).toLocaleDateString("ja-JP"),
-    tags: a.tags.slice(0, 4).map((t) => t.name),
-    likes: a.likes_count,
-    source: "Qiita",
+    url: `https://zenn.dev${a.path}`,
+    author: a.user?.username || "",
+    date: new Date(a.published_at).toLocaleDateString("ja-JP"),
+    tags: [tag],
+    likes: a.liked_count,
+    source: "Zenn",
   }));
-  if (currentSort === "popular") {
-    articles.sort((a, b) => b.likes - a.likes);
-    return articles.slice(0, 15);
-  }
-  return articles;
 }
 
 // ========== Dev.to ==========
@@ -59,8 +53,8 @@ async function fetchArticles(tag) {
 
   try {
     const articles =
-      currentSource === "qiita"
-        ? await fetchQiita(tag)
+      currentSource === "zenn"
+        ? await fetchZenn(tag)
         : await fetchDevto(tag);
 
     loadingEl.style.display = "none";
@@ -89,7 +83,7 @@ function createCard(article) {
   a.innerHTML = `
     <div class="card-body">
       <div class="card-header">
-        <span class="card-source ${article.source === "Qiita" ? "qiita" : "devto"}">${article.source}</span>
+        <span class="card-source ${article.source === "Zenn" ? "zenn" : "devto"}">${article.source}</span>
         <span class="card-likes">♥ ${article.likes}</span>
       </div>
       <div class="card-title">${article.title}</div>
@@ -113,7 +107,7 @@ sortBtns.forEach((btn) => {
     sortBtns.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     currentSort = btn.dataset.sort;
-    const filters = currentSource === "qiita" ? qiitaFilters : devtoFilters;
+    const filters = currentSource === "zenn" ? zennFilters : devtoFilters;
     fetchArticles(filters.querySelector(".filter-btn.active").dataset.tag);
   });
 });
@@ -125,12 +119,12 @@ sourceBtns.forEach((btn) => {
     btn.classList.add("active");
     currentSource = btn.dataset.source;
 
-    if (currentSource === "qiita") {
-      qiitaFilters.style.display = "flex";
+    if (currentSource === "zenn") {
+      zennFilters.style.display = "flex";
       devtoFilters.style.display = "none";
-      fetchArticles(qiitaFilters.querySelector(".filter-btn.active").dataset.tag);
+      fetchArticles(zennFilters.querySelector(".filter-btn.active").dataset.tag);
     } else {
-      qiitaFilters.style.display = "none";
+      zennFilters.style.display = "none";
       devtoFilters.style.display = "flex";
       fetchArticles(devtoFilters.querySelector(".filter-btn.active").dataset.tag);
     }
@@ -147,4 +141,4 @@ document.addEventListener("click", (e) => {
 });
 
 // 初期表示
-fetchArticles("UIデザイン");
+fetchArticles("design");

@@ -169,8 +169,8 @@ header p {
   border-radius: 999px;
 }
 
-.card-source.qiita {
-  background: #55c500;
+.card-source.zenn {
+  background: #3ea8ff;
   color: white;
 }
 
